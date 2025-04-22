@@ -1,0 +1,11 @@
+backend-gestao-projetos/
+├── config/
+│   └── database.js
+├── controllers/
+├── middlewares/
+├── models/
+├── routes/
+├── services/
+├── .env
+├── app.js
+├── server.js
