@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 export default function TarefasProjeto() {
-  const { id } = useParams(); // ID do projeto vindo da URL
+  const { id } = useParams();
   const [tarefas, setTarefas] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // ✅ Chamada inicial para buscar tarefas
   useEffect(() => {
     api.get(`/tarefas/${id}`)
       .then(res => setTarefas(res.data))
@@ -18,10 +19,23 @@ export default function TarefasProjeto() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // ✅ Função que você perguntou
+  const atualizarStatus = async (idTarefa, novoStatus) => {
+    try {
+      await api.put(`/tarefas/${idTarefa}`, { status: novoStatus });
+      const novasTarefas = tarefas.map(t =>
+        t.id === idTarefa ? { ...t, status: novoStatus } : t
+      );
+      setTarefas(novasTarefas);
+    } catch (err) {
+      console.error('Erro ao atualizar status:', err);
+      alert('Erro ao atualizar status da tarefa');
+    }
+  };
+
   return (
     <div style={{ padding: '2rem' }}>
       <h2>Tarefas do Projeto #{id}</h2>
-
       <button onClick={() => navigate('/')}>← Voltar</button>
       <button onClick={() => navigate(`/projeto/${id}/nova-tarefa`)}>
         + Nova Tarefa
@@ -34,8 +48,18 @@ export default function TarefasProjeto() {
           <ul>
             {tarefas.map(tarefa => (
               <li key={tarefa.id} style={{ marginBottom: '1rem' }}>
-                <strong>{tarefa.titulo}</strong> – <em>{tarefa.status}</em><br />
-                <small>{tarefa.descricao}</small>
+                <strong>{tarefa.titulo}</strong><br />
+                <small>{tarefa.descricao}</small><br />
+
+                <label>Status:</label>
+                <select
+                  value={tarefa.status}
+                  onChange={e => atualizarStatus(tarefa.id, e.target.value)}
+                >
+                  <option value="todo">A Fazer</option>
+                  <option value="em_andamento">Em Andamento</option>
+                  <option value="concluido">Concluído</option>
+                </select>
               </li>
             ))}
           </ul>
