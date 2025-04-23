@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
   const [projetos, setProjetos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // aqui sim, fora do return
 
   useEffect(() => {
     api.get('/projetos')
       .then(res => {
-        console.log('Projetos do backend:', res.data); // 🔍 debug importante
+        console.log('Projetos do backend:', res.data);
         setProjetos(res.data);
       })
       .catch(err => {
@@ -21,6 +23,12 @@ export default function Dashboard() {
   return (
     <div style={{ padding: '2rem' }}>
       <h2>Meus Projetos</h2>
+
+      {/* botão dentro do return */}
+      <button onClick={() => navigate('/novo-projeto')}>
+        + Novo Projeto
+      </button>
+
       {loading ? <p>Carregando...</p> : (
         <ul>
           {projetos.length === 0 ? (

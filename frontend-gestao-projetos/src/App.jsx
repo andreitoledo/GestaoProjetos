@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import NovoProjeto from './pages/NovoProjeto';
 
 const PrivateRoute = ({ children }) => {
   const { usuario } = useAuth();
@@ -19,6 +20,13 @@ function App() {
               <Dashboard />
             </PrivateRoute>
           } />
+
+          <Route path="/novo-projeto" element={
+            <PrivateRoute>
+              <NovoProjeto />
+            </PrivateRoute>
+          } />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>
