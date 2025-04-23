@@ -7,21 +7,46 @@ export default function TarefasProjeto() {
   const { id } = useParams();
   const [tarefas, setTarefas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
   const [file, setFile] = useState(null);
   const [modalAberto, setModalAberto] = useState(false);
   const [arquivoSelecionado, setArquivoSelecionado] = useState('');
+  const [comentarios, setComentarios] = useState({});
+  const [novoComentario, setNovoComentario] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     api.get(`/tarefas/${id}`)
-      .then(res => setTarefas(res.data))
+      .then(res => {
+        setTarefas(res.data);
+        res.data.forEach(t => carregarComentarios(t.id));
+      })
       .catch(err => {
         console.error(err);
         alert('Erro ao carregar tarefas');
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  const carregarComentarios = async (tarefaId) => {
+    try {
+      const res = await api.get(`/comentarios/${tarefaId}`);
+      setComentarios(prev => ({ ...prev, [tarefaId]: res.data }));
+    } catch (err) {
+      console.error('Erro ao carregar comentários:', err);
+    }
+  };
+
+  const enviarComentario = async (tarefaId) => {
+    if (!novoComentario.trim()) return;
+    try {
+      await api.post(`/comentarios/${tarefaId}`, { mensagem: novoComentario });
+      setNovoComentario('');
+      carregarComentarios(tarefaId);
+    } catch (err) {
+      console.error('Erro ao enviar comentário:', err);
+      alert('Erro ao comentar');
+    }
+  };
 
   const atualizarStatus = async (idTarefa, novoStatus) => {
     try {
@@ -39,7 +64,6 @@ export default function TarefasProjeto() {
   const excluirTarefa = async (idTarefa) => {
     const confirmar = window.confirm('Deseja realmente excluir esta tarefa?');
     if (!confirmar) return;
-
     try {
       await api.delete(`/tarefas/${idTarefa}`);
       setTarefas(tarefas.filter(t => t.id !== idTarefa));
@@ -49,26 +73,23 @@ export default function TarefasProjeto() {
     }
   };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setFile(e.target.files[0]);
 
   const handleUpload = async (e, tarefaId) => {
     e.preventDefault();
     if (!file) return alert('Selecione um arquivo');
-
     const formData = new FormData();
     formData.append('arquivo', file);
 
     try {
       await api.post(`/tarefas/${tarefaId}/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       alert('Arquivo enviado com sucesso!');
       setFile(null);
-
       const res = await api.get(`/tarefas/${id}`);
       setTarefas(res.data);
+      carregarComentarios(tarefaId); // para manter os comentários atualizados
     } catch (err) {
       console.error(err);
       alert('Erro ao fazer upload');
@@ -138,6 +159,7 @@ export default function TarefasProjeto() {
                   </div>
                 </div>
 
+                {/* Upload */}
                 <form
                   onSubmit={(e) => handleUpload(e, tarefa.id)}
                   className="mt-3 flex flex-col sm:flex-row gap-2 items-start sm:items-center"
@@ -155,7 +177,7 @@ export default function TarefasProjeto() {
                   </button>
                 </form>
 
-                {/* Link visualização */}
+                {/* Link para visualizar */}
                 {tarefa.arquivo && (
                   <div className="mt-2">
                     <button
@@ -169,13 +191,43 @@ export default function TarefasProjeto() {
                     </button>
                   </div>
                 )}
+
+                {/* Comentários */}
+                <div className="mt-4 border-t pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">💬 Comentários</h4>
+
+                  {comentarios[tarefa.id]?.map(c => (
+                    <div key={c.id} className="text-sm text-gray-800 mb-1 border-b pb-1">
+                      {c.mensagem}
+                      <span className="text-xs text-gray-400 block">
+                        {new Date(c.data).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Escreva um comentário..."
+                      value={novoComentario}
+                      onChange={e => setNovoComentario(e.target.value)}
+                      className="border rounded px-2 py-1 text-sm w-full"
+                    />
+                    <button
+                      onClick={() => enviarComentario(tarefa.id)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                    >
+                      Enviar
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modal de preview */}
       {modalAberto && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
           <div className="bg-white rounded-lg max-w-3xl w-full p-4 relative shadow-lg">
@@ -193,7 +245,7 @@ export default function TarefasProjeto() {
               <iframe
                 src={arquivoSelecionado}
                 className="w-full h-[70vh] rounded"
-                title="Pré-visualização do PDF"
+                title="Pré-visualização"
               />
             ) : (
               <img
