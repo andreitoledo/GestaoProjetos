@@ -3,14 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
 
-
 export default function TarefasProjeto() {
   const { id } = useParams();
   const [tarefas, setTarefas] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // ✅ Chamada inicial para buscar tarefas
   useEffect(() => {
     api.get(`/tarefas/${id}`)
       .then(res => setTarefas(res.data))
@@ -21,7 +19,6 @@ export default function TarefasProjeto() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // ✅ Função que você perguntou
   const atualizarStatus = async (idTarefa, novoStatus) => {
     try {
       await api.put(`/tarefas/${idTarefa}`, { status: novoStatus });
@@ -30,7 +27,7 @@ export default function TarefasProjeto() {
       );
       setTarefas(novasTarefas);
     } catch (err) {
-      console.error('Erro ao atualizar status:', err);
+      console.error(err);
       alert('Erro ao atualizar status da tarefa');
     }
   };
@@ -38,87 +35,83 @@ export default function TarefasProjeto() {
   const excluirTarefa = async (idTarefa) => {
     const confirmar = window.confirm('Deseja realmente excluir esta tarefa?');
     if (!confirmar) return;
-  
+
     try {
       await api.delete(`/tarefas/${idTarefa}`);
       setTarefas(tarefas.filter(t => t.id !== idTarefa));
     } catch (err) {
-      console.error('Erro ao excluir tarefa:', err);
+      console.error(err);
       alert('Erro ao excluir tarefa');
     }
   };
-  
 
   return (
     <>
       <Navbar />
-    <div style={{ padding: '2rem' }}>
-      <h2>Tarefas do Projeto #{id}</h2>
-      
-      <button onClick={() => navigate('/')}>← Voltar</button>
-      <button onClick={() => navigate(`/projeto/${id}/nova-tarefa`)}>
-        + Nova Tarefa
-      </button>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold">Tarefas do Projeto #{id}</h2>
+          <button
+            onClick={() => navigate(`/projeto/${id}/nova-tarefa`)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          >
+            + Nova Tarefa
+          </button>
+        </div>
 
-      {loading ? <p>Carregando...</p> : (
-        tarefas.length === 0 ? (
-          <p>Nenhuma tarefa cadastrada.</p>
+        {loading ? (
+          <p className="text-gray-500">Carregando tarefas...</p>
+        ) : tarefas.length === 0 ? (
+          <p className="text-gray-400">Nenhuma tarefa cadastrada.</p>
         ) : (
-          <ul>
+          <div className="space-y-4">
             {tarefas.map(tarefa => (
-              <li key={tarefa.id} style={{ marginBottom: '1rem' }}>
-                <strong>{tarefa.titulo}</strong><br />
-                <small>{tarefa.descricao}</small><br />
+              <div key={tarefa.id} className="bg-white p-4 border rounded shadow-sm">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-semibold">{tarefa.titulo}</h3>
+                    <p className="text-sm text-gray-600">{tarefa.descricao}</p>
+                  </div>
+                  <span className={`text-sm font-medium px-3 py-1 rounded
+                    ${tarefa.status === 'todo' ? 'bg-yellow-100 text-yellow-800' :
+                      tarefa.status === 'em_andamento' ? 'bg-blue-100 text-blue-800' :
+                        'bg-green-100 text-green-800'}
+                  `}>
+                    {tarefa.status.replace('_', ' ')}
+                  </span>
+                </div>
 
-                <label>Status:</label>
-                <select
-                  value={tarefa.status}
-                  onChange={e => atualizarStatus(tarefa.id, e.target.value)}
-                >
-                  <option value="todo">A Fazer</option>
-                  <option value="em_andamento">Em Andamento</option>
-                  <option value="concluido">Concluído</option>
-                </select>
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <select
+                    value={tarefa.status}
+                    onChange={e => atualizarStatus(tarefa.id, e.target.value)}
+                    className="border px-3 py-1 rounded text-sm"
+                  >
+                    <option value="todo">A Fazer</option>
+                    <option value="em_andamento">Em Andamento</option>
+                    <option value="concluido">Concluído</option>
+                  </select>
 
-                <button
-                          onClick={() => navigate(`/projeto/${id}/tarefa/${tarefa.id}/editar`)}
-                          style={{
-                            marginLeft: '0.5rem',
-                            backgroundColor: '#0d6efd',
-                            color: 'white',
-                            border: 'none',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          ✏️ Editar
-                        </button>
-
-                <button
-                    onClick={() => excluirTarefa(tarefa.id)}
-                    style={{
-                        marginTop: '0.5rem',
-                        color: 'white',
-                        backgroundColor: '#dc3545',
-                        border: 'none',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                    }}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/projeto/${id}/tarefa/${tarefa.id}/editar`)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                     >
-                    🗑️ Excluir
+                      ✏️ Editar
                     </button>
-
-                   
-
-
-              </li>
+                    <button
+                      onClick={() => excluirTarefa(tarefa.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                    >
+                      🗑️ Excluir
+                    </button>
+                  </div>
+                </div>
+              </div>
             ))}
-          </ul>
-        )
-      )}
-    </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }

@@ -23,6 +23,8 @@ export default function Dashboard() {
       <Navbar />
       <div style={{ padding: '2rem' }}>
         <h2>Meus Projetos</h2>
+        <h1 className="text-red-600 text-2xl font-bold">Tailwind funcionando!</h1>
+
 
         <button onClick={() => navigate('/novo-projeto')}>
           + Novo Projeto
