@@ -1,30 +1,33 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
 
-export default function TarefasProjeto() {
+const TarefasProjeto = () => {
   const { id } = useParams();
   const [tarefas, setTarefas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [file, setFile] = useState(null);
-  const [modalAberto, setModalAberto] = useState(false);
-  const [arquivoSelecionado, setArquivoSelecionado] = useState('');
   const [comentarios, setComentarios] = useState({});
-  const [novoComentario, setNovoComentario] = useState('');
-  const navigate = useNavigate();
+  const [novoComentario, setNovoComentario] = useState({});
+  const [tagsDisponiveis, setTagsDisponiveis] = useState([]);
+  const [tagSelecionada, setTagSelecionada] = useState({});
+  const [arquivos, setArquivos] = useState({});
 
   useEffect(() => {
-    api.get(`/tarefas/${id}`)
-      .then(res => {
+    const carregarTarefas = async () => {
+      try {
+        const res = await api.get(`/tarefas/${id}`);
         setTarefas(res.data);
-        res.data.forEach(t => carregarComentarios(t.id));
-      })
-      .catch(err => {
-        console.error(err);
-        alert('Erro ao carregar tarefas');
-      })
-      .finally(() => setLoading(false));
+        res.data.forEach(tarefa => {
+          carregarComentarios(tarefa.id);
+          carregarTagsPorTarefa(tarefa.id);
+        });
+      } catch (err) {
+        console.error('Erro ao carregar tarefas:', err);
+      }
+    };
+
+    carregarTarefas();
+    carregarTagsDisponiveis();
   }, [id]);
 
   const carregarComentarios = async (tarefaId) => {
@@ -32,231 +35,194 @@ export default function TarefasProjeto() {
       const res = await api.get(`/comentarios/${tarefaId}`);
       setComentarios(prev => ({ ...prev, [tarefaId]: res.data }));
     } catch (err) {
-      console.error('Erro ao carregar comentários:', err);
+      console.error(`Erro ao carregar comentários da tarefa ${tarefaId}:`, err);
     }
   };
 
-  const enviarComentario = async (tarefaId) => {
-    if (!novoComentario.trim()) return;
+  const carregarTagsPorTarefa = async (tarefaId) => {
     try {
-      await api.post(`/comentarios/${tarefaId}`, { mensagem: novoComentario });
-      setNovoComentario('');
+      const res = await api.get(`/tags/${tarefaId}`);
+      setTarefas(prev =>
+        prev.map(t =>
+          t.id === tarefaId ? { ...t, tags: res.data } : t
+        )
+      );
+    } catch (err) {
+      console.error(`Erro ao carregar tags da tarefa ${tarefaId}:`, err);
+    }
+  };
+
+  const carregarTagsDisponiveis = async () => {
+    try {
+      const res = await api.get('/tags');
+      setTagsDisponiveis(res.data);
+    } catch (err) {
+      console.error('Erro ao carregar tags disponíveis:', err);
+    }
+  };
+
+  const adicionarComentario = async (tarefaId) => {
+    const mensagem = novoComentario[tarefaId];
+    if (!mensagem) return;
+
+    try {
+      await api.post(`/comentarios/${tarefaId}`, { mensagem });
+      setNovoComentario(prev => ({ ...prev, [tarefaId]: '' }));
       carregarComentarios(tarefaId);
     } catch (err) {
-      console.error('Erro ao enviar comentário:', err);
-      alert('Erro ao comentar');
+      console.error('Erro ao adicionar comentário:', err);
+      alert('Erro ao adicionar comentário');
     }
   };
 
-  const atualizarStatus = async (idTarefa, novoStatus) => {
+  const adicionarTag = async (tarefaId, tagId) => {
     try {
-      await api.put(`/tarefas/${idTarefa}`, { status: novoStatus });
-      const novasTarefas = tarefas.map(t =>
-        t.id === idTarefa ? { ...t, status: novoStatus } : t
-      );
-      setTarefas(novasTarefas);
+      await api.post('/tags/associar', { tarefaId, tagId });
+      carregarTagsPorTarefa(tarefaId);
     } catch (err) {
-      console.error('Erro ao atualizar status:', err);
-      alert('Erro ao atualizar status da tarefa');
+      console.error('Erro ao associar tag:', err);
+      alert('Erro ao adicionar tag');
     }
   };
 
-  const excluirTarefa = async (idTarefa) => {
-    const confirmar = window.confirm('Deseja realmente excluir esta tarefa?');
-    if (!confirmar) return;
-    try {
-      await api.delete(`/tarefas/${idTarefa}`);
-      setTarefas(tarefas.filter(t => t.id !== idTarefa));
-    } catch (err) {
-      console.error('Erro ao excluir tarefa:', err);
-      alert('Erro ao excluir tarefa');
-    }
+  const handleArquivoChange = (tarefaId, file) => {
+    setArquivos(prev => ({ ...prev, [tarefaId]: file }));
   };
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
-
-  const handleUpload = async (e, tarefaId) => {
-    e.preventDefault();
-    if (!file) return alert('Selecione um arquivo');
+  const handleUpload = async (tarefaId) => {
+    const file = arquivos[tarefaId];
+    if (!file) return;
     const formData = new FormData();
     formData.append('arquivo', file);
-
     try {
-      await api.post(`/tarefas/${tarefaId}/upload`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      alert('Arquivo enviado com sucesso!');
-      setFile(null);
+      await api.post(`/tarefas/${tarefaId}/upload`, formData);
       const res = await api.get(`/tarefas/${id}`);
       setTarefas(res.data);
-      carregarComentarios(tarefaId); // para manter os comentários atualizados
+      alert('Arquivo enviado com sucesso!');
     } catch (err) {
-      console.error(err);
-      alert('Erro ao fazer upload');
+      console.error('Erro ao fazer upload:', err);
+      alert('Erro ao enviar arquivo');
     }
   };
 
   return (
     <>
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Tarefas do Projeto #{id}</h2>
-          <button
-            onClick={() => navigate(`/projeto/${id}/nova-tarefa`)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-          >
-            + Nova Tarefa
-          </button>
-        </div>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">Tarefas do Projeto</h1>
+        {tarefas.map(tarefa => (
+          <div key={tarefa.id} className="border p-4 mb-4 rounded shadow">
+            <h2 className="text-xl font-semibold">{tarefa.titulo}</h2>
+            <p className="text-gray-700">{tarefa.descricao}</p>
+            <p className="text-sm text-gray-500">Status: {tarefa.status}</p>
 
-        {loading ? (
-          <p className="text-gray-500">Carregando tarefas...</p>
-        ) : tarefas.length === 0 ? (
-          <p className="text-gray-400">Nenhuma tarefa cadastrada.</p>
-        ) : (
-          <div className="space-y-4">
-            {tarefas.map(tarefa => (
-              <div key={tarefa.id} className="bg-white p-4 border rounded shadow-sm">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-semibold">{tarefa.titulo}</h3>
-                    <p className="text-sm text-gray-600">{tarefa.descricao}</p>
-                  </div>
-                  <span className={`text-sm font-medium px-3 py-1 rounded
-                    ${tarefa.status === 'todo' ? 'bg-yellow-100 text-yellow-800' :
-                      tarefa.status === 'em_andamento' ? 'bg-blue-100 text-blue-800' :
-                        'bg-green-100 text-green-800'}
-                  `}>
-                    {tarefa.status.replace('_', ' ')}
-                  </span>
-                </div>
-
-                <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <select
-                    value={tarefa.status}
-                    onChange={e => atualizarStatus(tarefa.id, e.target.value)}
-                    className="border px-3 py-1 rounded text-sm"
+            {/* Upload de Arquivo */}
+            <div className="mt-4">
+              <input
+                type="file"
+                onChange={e => handleArquivoChange(tarefa.id, e.target.files[0])}
+                className="mb-2"
+              />
+              <button
+                onClick={() => handleUpload(tarefa.id)}
+                className="bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Enviar Arquivo
+              </button>
+              {tarefa.arquivo && (
+                <div className="mt-2">
+                  <a
+                    href={`http://localhost:3001/${tarefa.arquivo}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 underline text-sm"
                   >
-                    <option value="todo">A Fazer</option>
-                    <option value="em_andamento">Em Andamento</option>
-                    <option value="concluido">Concluído</option>
-                  </select>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => navigate(`/projeto/${id}/tarefa/${tarefa.id}/editar`)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-                    >
-                      ✏️ Editar
-                    </button>
-                    <button
-                      onClick={() => excluirTarefa(tarefa.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm"
-                    >
-                      🗑️ Excluir
-                    </button>
-                  </div>
+                    📎 Visualizar Arquivo
+                  </a>
                 </div>
+              )}
+            </div>
 
-                {/* Upload */}
-                <form
-                  onSubmit={(e) => handleUpload(e, tarefa.id)}
-                  className="mt-3 flex flex-col sm:flex-row gap-2 items-start sm:items-center"
+            {/* Comentários */}
+            <div className="mt-4">
+              <h3 className="text-lg font-medium">Comentários</h3>
+              <ul className="list-disc list-inside">
+                {(comentarios[tarefa.id] || []).map(comentario => (
+                  <li key={comentario.id}>{comentario.mensagem}</li>
+                ))}
+              </ul>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  value={novoComentario[tarefa.id] || ''}
+                  onChange={e =>
+                    setNovoComentario(prev => ({
+                      ...prev,
+                      [tarefa.id]: e.target.value
+                    }))
+                  }
+                  placeholder="Novo comentário"
+                  className="border px-2 py-1 rounded w-full"
+                />
+                <button
+                  onClick={() => adicionarComentario(tarefa.id)}
+                  className="mt-1 bg-green-500 text-white px-3 py-1 rounded"
                 >
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    className="block w-full text-sm border border-gray-300 rounded p-1"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-gray-700 text-white px-3 py-1 rounded text-sm"
-                  >
-                    📎 Enviar Arquivo
-                  </button>
-                </form>
-
-                {/* Link para visualizar */}
-                {tarefa.arquivo && (
-                  <div className="mt-2">
-                    <button
-                      onClick={() => {
-                        setArquivoSelecionado(`http://localhost:3001/${tarefa.arquivo}`);
-                        setModalAberto(true);
-                      }}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      📄 Visualizar Arquivo
-                    </button>
-                  </div>
-                )}
-
-                {/* Comentários */}
-                <div className="mt-4 border-t pt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">💬 Comentários</h4>
-
-                  {comentarios[tarefa.id]?.map(c => (
-                    <div key={c.id} className="text-sm text-gray-800 mb-1 border-b pb-1">
-                      {c.mensagem}
-                      <span className="text-xs text-gray-400 block">
-                        {new Date(c.data).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
-
-                  <div className="mt-2 flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Escreva um comentário..."
-                      value={novoComentario}
-                      onChange={e => setNovoComentario(e.target.value)}
-                      className="border rounded px-2 py-1 text-sm w-full"
-                    />
-                    <button
-                      onClick={() => enviarComentario(tarefa.id)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-                    >
-                      Enviar
-                    </button>
-                  </div>
-                </div>
+                  Adicionar Comentário
+                </button>
               </div>
-            ))}
+            </div>
+
+            {/* Tags */}
+            <div className="mt-4 border-t pt-3">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">🏷️ Tags</h4>
+
+              <div className="flex flex-wrap gap-2 mb-2">
+                {(tarefa.tags || []).map(tag => (
+                  <span
+                    key={tag.id}
+                    className="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs font-semibold"
+                  >
+                    {tag.nome}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <select
+                  className="text-sm border px-2 py-1 rounded"
+                  value={tagSelecionada[tarefa.id] || ''}
+                  onChange={e =>
+                    setTagSelecionada(prev => ({
+                      ...prev,
+                      [tarefa.id]: e.target.value
+                    }))
+                  }
+                >
+                  <option value="">-- Selecione uma tag --</option>
+                  {tagsDisponiveis.map(tag => (
+                    <option key={tag.id} value={tag.id}>
+                      {tag.nome}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={() => {
+                    const tagId = tagSelecionada[tarefa.id];
+                    if (tagId) adicionarTag(tarefa.id, tagId);
+                  }}
+                  className="bg-blue-500 text-white text-sm px-3 py-1 rounded"
+                >
+                  + Adicionar Tag
+                </button>
+              </div>
+            </div>
           </div>
-        )}
+        ))}
       </div>
-
-      {/* Modal de preview */}
-      {modalAberto && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
-          <div className="bg-white rounded-lg max-w-3xl w-full p-4 relative shadow-lg">
-            <button
-              className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-xl"
-              onClick={() => {
-                setModalAberto(false);
-                setArquivoSelecionado('');
-              }}
-            >
-              ❌
-            </button>
-
-            {arquivoSelecionado.endsWith('.pdf') ? (
-              <iframe
-                src={arquivoSelecionado}
-                className="w-full h-[70vh] rounded"
-                title="Pré-visualização"
-              />
-            ) : (
-              <img
-                src={arquivoSelecionado}
-                alt="Arquivo"
-                className="max-h-[70vh] mx-auto rounded"
-              />
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
-}
+};
+
+export default TarefasProjeto;
