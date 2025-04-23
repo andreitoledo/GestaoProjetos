@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
 
 export default function NovoProjeto() {
   const [nome, setNome] = useState('');
@@ -34,6 +35,8 @@ export default function NovoProjeto() {
   };
 
   return (
+    <>
+      <Navbar />
     <div style={{ padding: '2rem' }}>
       <h2>Novo Projeto</h2>
       <form onSubmit={handleSubmit}>
@@ -66,6 +69,7 @@ export default function NovoProjeto() {
 
         <button type="submit">Salvar Projeto</button>
       </form>
-    </div>
+      </div>
+      </>
   );
 }

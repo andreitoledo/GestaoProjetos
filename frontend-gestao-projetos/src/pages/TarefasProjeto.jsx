@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
+
 
 export default function TarefasProjeto() {
   const { id } = useParams();
@@ -48,8 +50,11 @@ export default function TarefasProjeto() {
   
 
   return (
+    <>
+      <Navbar />
     <div style={{ padding: '2rem' }}>
       <h2>Tarefas do Projeto #{id}</h2>
+      
       <button onClick={() => navigate('/')}>← Voltar</button>
       <button onClick={() => navigate(`/projeto/${id}/nova-tarefa`)}>
         + Nova Tarefa
@@ -114,5 +119,6 @@ export default function TarefasProjeto() {
         )
       )}
     </div>
+    </>
   );
 }

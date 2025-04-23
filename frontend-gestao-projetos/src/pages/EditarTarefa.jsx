@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
 
 export default function EditarTarefa() {
   const { id, tarefaId } = useParams(); // id = projetoId
@@ -44,6 +45,8 @@ export default function EditarTarefa() {
   };
 
   return (
+    <>
+      <Navbar />
     <div style={{ padding: '2rem' }}>
       <h2>Editar Tarefa #{tarefaId}</h2>
       <form onSubmit={handleSubmit}>
@@ -69,6 +72,7 @@ export default function EditarTarefa() {
 
         <button type="submit">Salvar Alterações</button>
       </form>
-    </div>
+      </div>
+      </>
   );
 }

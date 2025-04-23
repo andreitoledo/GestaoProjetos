@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
 
 export default function NovaTarefa() {
   const [titulo, setTitulo] = useState('');
@@ -35,6 +36,8 @@ export default function NovaTarefa() {
   };
 
   return (
+    <>
+      <Navbar />
     <div style={{ padding: '2rem' }}>
       <h2>Nova Tarefa – Projeto #{projetoId}</h2>
       <form onSubmit={handleSubmit}>
@@ -60,6 +63,7 @@ export default function NovaTarefa() {
 
         <button type="submit">Salvar Tarefa</button>
       </form>
-    </div>
+      </div>
+      </>
   );
 }
