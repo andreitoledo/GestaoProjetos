@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const tarefaController = require('../controllers/tarefaController');
-const auth = require('../middlewares/auth');
+const autenticar = require('../middlewares/auth'); // ou use auth, mas escolha 1 só
 
-router.use(auth);
+router.use(autenticar); // aplica a todos
 
+router.get('/resumo', tarefaController.resumo);
 router.post('/', tarefaController.criar);
 router.get('/:projetoId', tarefaController.listarPorProjeto);
 router.put('/:id', tarefaController.atualizar);

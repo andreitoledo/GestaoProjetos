@@ -71,5 +71,23 @@ module.exports = {
     } catch (err) {
       res.status(500).json({ erro: 'Erro ao deletar tarefa' });
     }
-  }
+  },
+
+  async resumo(req, res) {
+    try {
+      const usuarioId = req.usuario.id;
+  
+      const total = await Tarefa.count({ where: { UsuarioId: usuarioId } });
+      const concluido = await Tarefa.count({ where: { UsuarioId: usuarioId, status: 'concluido' } });
+      const andamento = await Tarefa.count({ where: { UsuarioId: usuarioId, status: 'em_andamento' } });
+      const afazer = await Tarefa.count({ where: { UsuarioId: usuarioId, status: 'todo' } });
+  
+      return res.json({ total, concluido, andamento, afazer });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ erro: 'Erro ao buscar resumo' });
+    }
+  } 
+
+
 };
