@@ -4,10 +4,13 @@ import api from '../services/api';
 import Navbar from '../components/Navbar';
 
 export default function TarefasProjeto() {
-  const { id } = useParams();
+  const { id } = useParams(); // id do projeto
   const [tarefas, setTarefas] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const [file, setFile] = useState(null);
+  const [uploadTarget, setUploadTarget] = useState(null);
 
   useEffect(() => {
     api.get(`/tarefas/${id}`)
@@ -27,7 +30,7 @@ export default function TarefasProjeto() {
       );
       setTarefas(novasTarefas);
     } catch (err) {
-      console.error(err);
+      console.error('Erro ao atualizar status:', err);
       alert('Erro ao atualizar status da tarefa');
     }
   };
@@ -40,8 +43,32 @@ export default function TarefasProjeto() {
       await api.delete(`/tarefas/${idTarefa}`);
       setTarefas(tarefas.filter(t => t.id !== idTarefa));
     } catch (err) {
-      console.error(err);
+      console.error('Erro ao excluir tarefa:', err);
       alert('Erro ao excluir tarefa');
+    }
+  };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUpload = async (e, tarefaId) => {
+    e.preventDefault();
+    if (!file) return alert('Selecione um arquivo');
+
+    const formData = new FormData();
+    formData.append('arquivo', file);
+
+    try {
+      await api.post(`/tarefas/${tarefaId}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      alert('Arquivo enviado com sucesso!');
+      setFile(null);
+      setUploadTarget(null);
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao fazer upload');
     }
   };
 
@@ -107,6 +134,24 @@ export default function TarefasProjeto() {
                     </button>
                   </div>
                 </div>
+
+                {/* Upload de arquivo */}
+                <form
+                  onSubmit={(e) => handleUpload(e, tarefa.id)}
+                  className="mt-3 flex flex-col sm:flex-row gap-2 items-start sm:items-center"
+                >
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    className="block w-full text-sm border border-gray-300 rounded p-1"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                  >
+                    📎 Enviar Arquivo
+                  </button>
+                </form>
               </div>
             ))}
           </div>
