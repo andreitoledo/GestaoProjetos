@@ -16,6 +16,10 @@ const Tarefa = sequelize.define('Tarefa', {
   dataCriacao: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
+  },
+  arquivo: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'Tarefas',
@@ -31,5 +35,8 @@ Tarefa.belongsTo(Usuario, {
   foreignKey: 'UsuarioId',
   as: 'responsavel'
 });
+
+
+
 
 module.exports = Tarefa;

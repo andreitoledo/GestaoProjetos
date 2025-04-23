@@ -4,13 +4,14 @@ import api from '../services/api';
 import Navbar from '../components/Navbar';
 
 export default function TarefasProjeto() {
-  const { id } = useParams(); // id do projeto
+  const { id } = useParams();
   const [tarefas, setTarefas] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const [file, setFile] = useState(null);
-  const [uploadTarget, setUploadTarget] = useState(null);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [arquivoSelecionado, setArquivoSelecionado] = useState('');
 
   useEffect(() => {
     api.get(`/tarefas/${id}`)
@@ -65,7 +66,9 @@ export default function TarefasProjeto() {
       });
       alert('Arquivo enviado com sucesso!');
       setFile(null);
-      setUploadTarget(null);
+
+      const res = await api.get(`/tarefas/${id}`);
+      setTarefas(res.data);
     } catch (err) {
       console.error(err);
       alert('Erro ao fazer upload');
@@ -135,7 +138,6 @@ export default function TarefasProjeto() {
                   </div>
                 </div>
 
-                {/* Upload de arquivo */}
                 <form
                   onSubmit={(e) => handleUpload(e, tarefa.id)}
                   className="mt-3 flex flex-col sm:flex-row gap-2 items-start sm:items-center"
@@ -152,11 +154,57 @@ export default function TarefasProjeto() {
                     📎 Enviar Arquivo
                   </button>
                 </form>
+
+                {/* Link visualização */}
+                {tarefa.arquivo && (
+                  <div className="mt-2">
+                    <button
+                      onClick={() => {
+                        setArquivoSelecionado(`http://localhost:3001/${tarefa.arquivo}`);
+                        setModalAberto(true);
+                      }}
+                      className="text-blue-600 hover:underline text-sm"
+                    >
+                      📄 Visualizar Arquivo
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Modal */}
+      {modalAberto && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
+          <div className="bg-white rounded-lg max-w-3xl w-full p-4 relative shadow-lg">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-xl"
+              onClick={() => {
+                setModalAberto(false);
+                setArquivoSelecionado('');
+              }}
+            >
+              ❌
+            </button>
+
+            {arquivoSelecionado.endsWith('.pdf') ? (
+              <iframe
+                src={arquivoSelecionado}
+                className="w-full h-[70vh] rounded"
+                title="Pré-visualização do PDF"
+              />
+            ) : (
+              <img
+                src={arquivoSelecionado}
+                alt="Arquivo"
+                className="max-h-[70vh] mx-auto rounded"
+              />
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

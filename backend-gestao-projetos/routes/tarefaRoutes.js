@@ -1,30 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const tarefaController = require('../controllers/tarefaController');
-const autenticar = require('../middlewares/auth'); // ou use auth, mas escolha 1 só
+const autenticar = require('../middlewares/auth');
 const upload = require('../middlewares/uploadMiddleware');
+const Tarefa = require('../models/Tarefa'); // ❗ necessário aqui
 
-router.use(autenticar); // aplica a todos
+router.use(autenticar);
 
+// Rotas principais
 router.get('/resumo', tarefaController.resumo);
 router.post('/', tarefaController.criar);
 router.get('/:projetoId', tarefaController.listarPorProjeto);
 router.put('/:id', tarefaController.atualizar);
 router.delete('/:id', tarefaController.deletar);
 
+// Upload de arquivo por tarefa
 router.post('/:id/upload', upload.single('arquivo'), async (req, res) => {
-    try {
-      const tarefaId = req.params.id;
-      const filePath = req.file.path;
-  
-      // Aqui você pode salvar no banco se quiser (opcional)
-      // await Tarefa.update({ arquivo: filePath }, { where: { id: tarefaId } });
-  
-      res.status(200).json({ msg: 'Upload realizado com sucesso', path: filePath });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ erro: 'Erro ao fazer upload' });
+  try {
+    const tarefaId = req.params.id;
+
+    // ✅ validação: nenhum arquivo enviado
+    if (!req.file) {
+      return res.status(400).json({ erro: 'Nenhum arquivo foi enviado.' });
     }
-  });
-  
+
+    const filePath = req.file.path;
+
+    const tarefa = await Tarefa.findByPk(tarefaId);
+    if (!tarefa) {
+      return res.status(404).json({ erro: 'Tarefa não encontrada' });
+    }
+
+    tarefa.arquivo = filePath;
+    await tarefa.save();
+
+    res.status(200).json({ msg: 'Upload salvo com sucesso', path: filePath });
+  } catch (err) {
+    console.error('Erro ao fazer upload:', err);
+    res.status(500).json({ erro: 'Erro interno ao fazer upload' });
+  }
+});
+
 module.exports = router;
