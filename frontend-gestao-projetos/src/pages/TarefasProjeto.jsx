@@ -33,6 +33,20 @@ export default function TarefasProjeto() {
     }
   };
 
+  const excluirTarefa = async (idTarefa) => {
+    const confirmar = window.confirm('Deseja realmente excluir esta tarefa?');
+    if (!confirmar) return;
+  
+    try {
+      await api.delete(`/tarefas/${idTarefa}`);
+      setTarefas(tarefas.filter(t => t.id !== idTarefa));
+    } catch (err) {
+      console.error('Erro ao excluir tarefa:', err);
+      alert('Erro ao excluir tarefa');
+    }
+  };
+  
+
   return (
     <div style={{ padding: '2rem' }}>
       <h2>Tarefas do Projeto #{id}</h2>
@@ -60,6 +74,22 @@ export default function TarefasProjeto() {
                   <option value="em_andamento">Em Andamento</option>
                   <option value="concluido">Concluído</option>
                 </select>
+
+                <button
+                    onClick={() => excluirTarefa(tarefa.id)}
+                    style={{
+                        marginTop: '0.5rem',
+                        color: 'white',
+                        backgroundColor: '#dc3545',
+                        border: 'none',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    }}
+                    >
+                    🗑️ Excluir
+                    </button>
+
               </li>
             ))}
           </ul>
