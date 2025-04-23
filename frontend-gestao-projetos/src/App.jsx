@@ -6,6 +6,8 @@ import NovoProjeto from './pages/NovoProjeto';
 import TarefasProjeto from './pages/TarefasProjeto';
 import NovaTarefa from './pages/NovaTarefa';
 import EditarTarefa from './pages/EditarTarefa';
+import AdminUsuarios from './pages/AdminUsuarios';
+
 
 
 const PrivateRoute = ({ children }) => {
@@ -30,7 +32,7 @@ function App() {
               <NovoProjeto />
             </PrivateRoute>
           } />
-          
+
           <Route path="/projeto/:id" element={
             <PrivateRoute>
               <TarefasProjeto />
@@ -43,11 +45,17 @@ function App() {
             </PrivateRoute>
           } />
 
-            <Route path="/projeto/:id/tarefa/:tarefaId/editar" element={
-              <PrivateRoute>
-                <EditarTarefa />
-              </PrivateRoute>
-            } />
+          <Route path="/projeto/:id/tarefa/:tarefaId/editar" element={
+            <PrivateRoute>
+              <EditarTarefa />
+            </PrivateRoute>
+          } />
+
+          <Route path="/admin/usuarios" element={
+            <PrivateRoute>
+              <AdminUsuarios />
+            </PrivateRoute>
+          } />
 
         </Routes>
       </BrowserRouter>

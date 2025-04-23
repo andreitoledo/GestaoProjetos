@@ -23,5 +23,8 @@ app.use('/api/tarefas', tarefaRoutes);
 const tagRoutes = require('./routes/tagRoutes');
 app.use('/api/tags', tagRoutes);
 
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
+
 
 module.exports = app;
