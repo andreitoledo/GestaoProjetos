@@ -1,12 +1,13 @@
 const Tarefa = require('../models/Tarefa');
 const Projeto = require('../models/Projeto');
+const sequelize = require('../config/database'); // ✅ CORRETO!
+
 
 module.exports = {
   async criar(req, res) {
     try {
       const { titulo, descricao, status, ProjetoId } = req.body;
 
-      // 🔐 Validação do Projeto
       const projeto = await Projeto.findByPk(ProjetoId);
       if (!projeto) {
         return res.status(400).json({ erro: 'Projeto informado não existe' });
@@ -73,21 +74,26 @@ module.exports = {
     }
   },
 
+  // 👇 Função para o gráfico do dashboard
   async resumo(req, res) {
     try {
-      const usuarioId = req.usuario.id;
-  
-      const total = await Tarefa.count({ where: { UsuarioId: usuarioId } });
-      const concluido = await Tarefa.count({ where: { UsuarioId: usuarioId, status: 'concluido' } });
-      const andamento = await Tarefa.count({ where: { UsuarioId: usuarioId, status: 'em_andamento' } });
-      const afazer = await Tarefa.count({ where: { UsuarioId: usuarioId, status: 'todo' } });
-  
-      return res.json({ total, concluido, andamento, afazer });
+      const [resultado] = await sequelize.query(`
+        SELECT 
+          COUNT(CASE WHEN status = 'todo' THEN 1 END) AS todo,
+          COUNT(CASE WHEN status = 'em_andamento' THEN 1 END) AS em_andamento,
+          COUNT(CASE WHEN status = 'concluido' THEN 1 END) AS concluido
+        FROM Tarefas
+      `);
+
+      const r = resultado[0];
+      res.json({
+        todo: Number(r.todo),
+        em_andamento: Number(r.em_andamento),
+        concluido: Number(r.concluido)
+      });
     } catch (err) {
-      console.error(err);
-      return res.status(500).json({ erro: 'Erro ao buscar resumo' });
+      console.error('Erro ao gerar resumo de tarefas:', err);
+      res.status(500).json({ erro: 'Erro ao gerar resumo' });
     }
-  } 
-
-
+  }
 };

@@ -1,38 +1,46 @@
 import { useEffect, useState } from 'react';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import api from '../services/api';
 
+Chart.register(ArcElement, Tooltip, Legend);
+
 export default function ResumoDashboard() {
-  const [resumo, setResumo] = useState(null);
+  const [resumo, setResumo] = useState({ todo: 0, em_andamento: 0, concluido: 0 });
 
   useEffect(() => {
-    api.get('/tarefas/resumo')
-      .then(res => setResumo(res.data))
-      .catch(err => {
-        console.error(err);
-        alert('Erro ao carregar resumo');
-      });
+    async function fetchData() {
+      try {
+        const res = await api.get('/tarefas/resumo');
+        console.log('Resumo vindo do backend:', res.data); // 👈 VERIFICAR AQUI
+        setResumo(res.data);
+      } catch (err) {
+        console.error('Erro ao carregar resumo:', err);
+      }
+    }
+    fetchData();
   }, []);
 
-  if (!resumo) return null;
+  const data = {
+    labels: ['A Fazer', 'Em Andamento', 'Concluído'],
+    datasets: [
+      {
+        label: 'Tarefas',
+        data: [
+          resumo.todo || 0,
+          resumo.em_andamento || 0,
+          resumo.concluido || 0
+        ],
+        backgroundColor: ['#facc15', '#60a5fa', '#4ade80'],
+        borderWidth: 1
+      }
+    ]
+  };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      <div className="bg-blue-100 border-l-4 border-blue-500 p-4 rounded shadow">
-        <h4 className="text-blue-800 font-semibold text-lg">Total</h4>
-        <p className="text-2xl font-bold">{resumo.total}</p>
-      </div>
-      <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded shadow">
-        <h4 className="text-yellow-800 font-semibold text-lg">A Fazer</h4>
-        <p className="text-2xl font-bold">{resumo.afazer}</p>
-      </div>
-      <div className="bg-indigo-100 border-l-4 border-indigo-500 p-4 rounded shadow">
-        <h4 className="text-indigo-800 font-semibold text-lg">Em Andamento</h4>
-        <p className="text-2xl font-bold">{resumo.andamento}</p>
-      </div>
-      <div className="bg-green-100 border-l-4 border-green-500 p-4 rounded shadow sm:col-span-3">
-        <h4 className="text-green-800 font-semibold text-lg">Concluído</h4>
-        <p className="text-2xl font-bold">{resumo.concluido}</p>
-      </div>
+    <div className="bg-white shadow rounded p-4 mb-6 max-w-md">
+      <h2 className="text-lg font-bold mb-4">Resumo de Tarefas</h2>
+      <Doughnut data={data} />
     </div>
   );
 }
