@@ -36,6 +36,21 @@ Tarefa.belongsTo(Usuario, {
   as: 'responsavel'
 });
 
+const Tag = require('./Tag');
+
+Tarefa.belongsToMany(Tag, {
+  through: 'TarefaTags',
+  foreignKey: 'TarefaId',
+  otherKey: 'TagId',
+  timestamps: false 
+});
+
+Tag.belongsToMany(Tarefa, {
+  through: 'TarefaTags',
+  foreignKey: 'TagId',
+  otherKey: 'TarefaId',
+  timestamps: false 
+});
 
 
 

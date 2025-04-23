@@ -20,4 +20,8 @@ app.use('/api/projetos', projetoRoutes);
 const tarefaRoutes = require('./routes/tarefaRoutes');
 app.use('/api/tarefas', tarefaRoutes);
 
+const tagRoutes = require('./routes/tagRoutes');
+app.use('/api/tags', tagRoutes);
+
+
 module.exports = app;
