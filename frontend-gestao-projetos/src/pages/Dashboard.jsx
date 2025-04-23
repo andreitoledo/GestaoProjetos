@@ -23,19 +23,28 @@ export default function Dashboard() {
   return (
     <div style={{ padding: '2rem' }}>
       <h2>Meus Projetos</h2>
-
-      {/* botão dentro do return */}
+  
       <button onClick={() => navigate('/novo-projeto')}>
         + Novo Projeto
       </button>
-
+  
       {loading ? <p>Carregando...</p> : (
         <ul>
           {projetos.length === 0 ? (
             <p>Nenhum projeto cadastrado.</p>
           ) : (
             projetos.map(proj => (
-              <li key={proj.id}>
+              <li
+                key={proj.id}
+                onClick={() => navigate(`/projeto/${proj.id}`)}
+                style={{
+                  cursor: 'pointer',
+                  marginBottom: '1rem',
+                  padding: '1rem',
+                  border: '1px solid #ccc',
+                  borderRadius: '6px'
+                }}
+              >
                 <strong>{proj.nome}</strong><br />
                 <span>{proj.descricao}</span>
               </li>
@@ -45,4 +54,5 @@ export default function Dashboard() {
       )}
     </div>
   );
+  
 }

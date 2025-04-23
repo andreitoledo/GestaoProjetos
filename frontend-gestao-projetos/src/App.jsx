@@ -3,6 +3,9 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import NovoProjeto from './pages/NovoProjeto';
+import TarefasProjeto from './pages/TarefasProjeto';
+import NovaTarefa from './pages/NovaTarefa';
+
 
 const PrivateRoute = ({ children }) => {
   const { usuario } = useAuth();
@@ -24,6 +27,18 @@ function App() {
           <Route path="/novo-projeto" element={
             <PrivateRoute>
               <NovoProjeto />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/projeto/:id" element={
+            <PrivateRoute>
+              <TarefasProjeto />
+            </PrivateRoute>
+          } />
+
+          <Route path="/projeto/:id/nova-tarefa" element={
+            <PrivateRoute>
+              <NovaTarefa />
             </PrivateRoute>
           } />
 
