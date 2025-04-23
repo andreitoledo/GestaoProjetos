@@ -24,7 +24,8 @@ module.exports = {
     if (!usuario || !await bcrypt.compare(senha, usuario.senhaHash))
       return res.status(401).json({ erro: 'Credenciais inválidas' });
 
-    const token = gerarToken({ id: usuario.id, role: usuario.role });
+    const token = gerarToken({ id: usuario.id, role: usuario.role }); // ← garanta que é `role` no payload
+
     return res.json({ token, usuario: { id: usuario.id, nome: usuario.nome, email, role: usuario.role } });
   }
 }
