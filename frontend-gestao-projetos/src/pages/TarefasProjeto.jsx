@@ -76,6 +76,21 @@ export default function TarefasProjeto() {
                 </select>
 
                 <button
+                          onClick={() => navigate(`/projeto/${id}/tarefa/${tarefa.id}/editar`)}
+                          style={{
+                            marginLeft: '0.5rem',
+                            backgroundColor: '#0d6efd',
+                            color: 'white',
+                            border: 'none',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ✏️ Editar
+                        </button>
+
+                <button
                     onClick={() => excluirTarefa(tarefa.id)}
                     style={{
                         marginTop: '0.5rem',
@@ -89,6 +104,9 @@ export default function TarefasProjeto() {
                     >
                     🗑️ Excluir
                     </button>
+
+                   
+
 
               </li>
             ))}

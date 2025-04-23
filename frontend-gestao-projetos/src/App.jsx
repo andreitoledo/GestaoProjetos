@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import NovoProjeto from './pages/NovoProjeto';
 import TarefasProjeto from './pages/TarefasProjeto';
 import NovaTarefa from './pages/NovaTarefa';
+import EditarTarefa from './pages/EditarTarefa';
 
 
 const PrivateRoute = ({ children }) => {
@@ -41,6 +42,12 @@ function App() {
               <NovaTarefa />
             </PrivateRoute>
           } />
+
+            <Route path="/projeto/:id/tarefa/:tarefaId/editar" element={
+              <PrivateRoute>
+                <EditarTarefa />
+              </PrivateRoute>
+            } />
 
         </Routes>
       </BrowserRouter>
