@@ -11,7 +11,7 @@ export default function EditarTarefa() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get(`/tarefas/${id}`) // rota lista todas por projeto
+    api.get(`/tarefas/${id}`) // usando o endpoint que traz todas as tarefas do projeto
       .then(res => {
         const tarefa = res.data.find(t => t.id === parseInt(tarefaId));
         if (tarefa) {
@@ -47,32 +47,42 @@ export default function EditarTarefa() {
   return (
     <>
       <Navbar />
-    <div style={{ padding: '2rem' }}>
-      <h2>Editar Tarefa #{tarefaId}</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Título"
-          value={titulo}
-          onChange={e => setTitulo(e.target.value)}
-        /><br />
+      <div className="max-w-xl mx-auto p-6">
+        <h2 className="text-2xl font-bold mb-4">Editar Tarefa</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            className="w-full border p-2 rounded"
+            type="text"
+            placeholder="Título"
+            value={titulo}
+            onChange={e => setTitulo(e.target.value)}
+          />
 
-        <textarea
-          placeholder="Descrição"
-          value={descricao}
-          onChange={e => setDescricao(e.target.value)}
-        /><br />
+          <textarea
+            className="w-full border p-2 rounded"
+            placeholder="Descrição"
+            value={descricao}
+            onChange={e => setDescricao(e.target.value)}
+          />
 
-        <label>Status:</label>
-        <select value={status} onChange={e => setStatus(e.target.value)}>
-          <option value="todo">A Fazer</option>
-          <option value="em_andamento">Em Andamento</option>
-          <option value="concluido">Concluído</option>
-        </select><br />
+          <select
+            className="w-full border p-2 rounded"
+            value={status}
+            onChange={e => setStatus(e.target.value)}
+          >
+            <option value="todo">A Fazer</option>
+            <option value="em_andamento">Em Andamento</option>
+            <option value="concluido">Concluído</option>
+          </select>
 
-        <button type="submit">Salvar Alterações</button>
-      </form>
+          <button
+            type="submit"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+          >
+            Atualizar Tarefa
+          </button>
+        </form>
       </div>
-      </>
+    </>
   );
 }

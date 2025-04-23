@@ -13,11 +13,6 @@ export default function NovoProjeto() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!nome || !descricao) {
-      alert('Preencha os campos obrigatórios!');
-      return;
-    }
-
     try {
       await api.post('/projetos', {
         nome,
@@ -26,7 +21,7 @@ export default function NovoProjeto() {
         dataFim
       });
 
-      alert('Projeto criado com sucesso!');
+      alert('Projeto criado!');
       navigate('/');
     } catch (err) {
       console.error(err);
@@ -37,39 +32,48 @@ export default function NovoProjeto() {
   return (
     <>
       <Navbar />
-    <div style={{ padding: '2rem' }}>
-      <h2>Novo Projeto</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Nome do Projeto"
-          value={nome}
-          onChange={e => setNome(e.target.value)}
-        /><br />
+      <div className="max-w-xl mx-auto p-6">
+        <h2 className="text-2xl font-bold mb-4">Novo Projeto</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            className="w-full border p-2 rounded"
+            type="text"
+            placeholder="Nome do Projeto"
+            value={nome}
+            onChange={e => setNome(e.target.value)}
+          />
 
-        <textarea
-          placeholder="Descrição"
-          value={descricao}
-          onChange={e => setDescricao(e.target.value)}
-        /><br />
+          <textarea
+            className="w-full border p-2 rounded"
+            placeholder="Descrição"
+            value={descricao}
+            onChange={e => setDescricao(e.target.value)}
+          />
 
-        <label>Data de Início:</label>
-        <input
-          type="date"
-          value={dataInicio}
-          onChange={e => setDataInicio(e.target.value)}
-        /><br />
+          <label className="block text-sm font-medium text-gray-700">Data de Início:</label>
+          <input
+            className="w-full border p-2 rounded"
+            type="date"
+            value={dataInicio}
+            onChange={e => setDataInicio(e.target.value)}
+          />
 
-        <label>Data de Fim:</label>
-        <input
-          type="date"
-          value={dataFim}
-          onChange={e => setDataFim(e.target.value)}
-        /><br />
+          <label className="block text-sm font-medium text-gray-700">Data de Fim:</label>
+          <input
+            className="w-full border p-2 rounded"
+            type="date"
+            value={dataFim}
+            onChange={e => setDataFim(e.target.value)}
+          />
 
-        <button type="submit">Salvar Projeto</button>
-      </form>
+          <button
+            type="submit"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          >
+            Salvar Projeto
+          </button>
+        </form>
       </div>
-      </>
+    </>
   );
 }
