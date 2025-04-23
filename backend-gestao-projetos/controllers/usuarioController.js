@@ -2,6 +2,7 @@ const Usuario = require('../models/Usuario');
 const bcrypt = require('bcryptjs');
 
 module.exports = {
+  // Listar todos os usuários (apenas admin)
   async listar(req, res) {
     if (req.usuario.perfil !== 'admin') {
       return res.status(403).json({ erro: 'Acesso negado' });
@@ -18,6 +19,7 @@ module.exports = {
     }
   },
 
+  // Criar novo usuário
   async criar(req, res) {
     if (req.usuario.perfil !== 'admin') {
       return res.status(403).json({ erro: 'Acesso negado' });
@@ -48,6 +50,29 @@ module.exports = {
       });
     } catch (err) {
       res.status(500).json({ erro: 'Erro ao criar usuário', detalhes: err.message });
+    }
+  },
+
+  // Atualizar usuário
+  async atualizar(req, res) {
+    if (req.usuario.perfil !== 'admin') {
+      return res.status(403).json({ erro: 'Acesso negado' });
+    }
+
+    const { id } = req.params;
+    const { nome, email, perfil } = req.body;
+
+    try {
+      const usuario = await Usuario.findByPk(id);
+      if (!usuario) {
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
+      }
+
+      await usuario.update({ nome, email, perfil });
+
+      res.json({ msg: 'Usuário atualizado com sucesso' });
+    } catch (err) {
+      res.status(500).json({ erro: 'Erro ao atualizar usuário', detalhes: err.message });
     }
   }
 };

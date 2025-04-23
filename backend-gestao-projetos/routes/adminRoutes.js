@@ -7,5 +7,7 @@ router.use(autenticar);
 
 router.get('/usuarios', usuarioController.listar); // ✅
 router.post('/usuarios', usuarioController.criar); // ✅
+router.put('/usuarios/:id', usuarioController.atualizar);
+
 
 module.exports = router;
