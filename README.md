@@ -1,17 +1,62 @@
-# 📋 Gestão de Projetos com React, Node.js e SQL Server
+# 🧠 Gestão de Projetos Web
 
-Sistema web completo para gestão de projetos, tarefas, comentários, uploads e usuários, com níveis de acesso por perfil (admin e cliente).
+Sistema completo de gestão de projetos desenvolvido com **React**, **Node.js** e **Sequelize + SQL Server**. Permite o controle de tarefas, comentários, arquivos, tags, usuários e permissões — com autenticação via JWT.
+
+![Dashboard do Sistema](./banner-dashboard.png)
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-Frontend: React.js, TailwindCSS
-Backend: Node.js + Express
-Banco de dados: SQL Server
-ORM: Sequelize
-Autenticação: JWT
-Upload de arquivos: multipart/form-data (com armazenamento local)
+- **Frontend:** React.js + Tailwind CSS
+- **Backend:** Node.js + Express
+- **Banco de Dados:** SQL Server (ORM: Sequelize)
+- **Autenticação:** JWT
+- **Upload de Arquivos:** Multer
+- **Outros:** Axios, React Router DOM
+
+---
+
+## 🔐 Funcionalidades
+
+### 👤 Login e Autenticação
+
+- Autenticação com JWT (login com token)
+- Redirecionamento por perfil (cliente ou admin)
+- Tela de login com retorno de token
+- Cadastro e gerenciamento de projetos por usuário
+- CRUD de tarefas por projeto
+- Controle de status das tarefas (todo, em andamento, concluído)
+- Comentários por tarefa
+- Upload e visualização de arquivos anexados
+- Tags associadas às tarefas
+- Dashboard com resumo gráfico (tarefas por status)
+- Painel administrativo para gerenciamento de usuários (apenas admin)
+
+---
+
+### 📁 Administração de Projetos
+- Cadastro, edição e exclusão de projetos
+- Visualização de tarefas por projeto
+
+---
+
+### ✅ Gestão de Tarefas
+- Criação de tarefas com status (A Fazer, Em Andamento, Concluído)
+- Comentários por tarefa
+- Upload de arquivos
+- Associação de tags
+
+---
+
+### 🔧 Painel Administrativo
+- Cadastro, edição e exclusão de usuários
+- Permissões por perfil (`admin` ou `cliente`)
+
+---
+
+### 📊 Dashboard
+- Resumo visual com gráfico de status das tarefas
 
 ---
 
@@ -29,20 +74,22 @@ gestao-projetos/ ├── backend-gestao-projetos/ │ └── Node.js + Expr
 
 ---
 
-## 🧭 Funcionalidades
+## 🧠 Estrutura do Pastas
 
-Autenticação com JWT (login com token)
-Tela de login com retorno de token
-Cadastro e gerenciamento de projetos por usuário
-CRUD de tarefas por projeto
-Controle de status das tarefas (todo, em andamento, concluído)
-Comentários por tarefa
-Upload e visualização de arquivos anexados
-Tags associadas às tarefas
-Dashboard com resumo gráfico (tarefas por status)
-Painel administrativo para gerenciamento de usuários (apenas admin)
+├── backend-gestao-projetos
+│   ├── controllers
+│   ├── models
+│   ├── routes
+│   ├── middlewares
+│   └── config
+└── frontend-gestao-projetos
+    ├── pages
+    ├── components
+    ├── context
+    └── services
 
 ---
+
 ## 🖥️ Como rodar o projeto localmente
 
 1. Clone este repositório
@@ -77,13 +124,23 @@ DB_PASS=suasenha
 JWT_SECRET=sua_chave_secreta
 ---
 
-📸 Prints do sistema
-Inclua algumas imagens aqui (dashboard, tela de tarefas, administração de usuários...)
+## 🔑 Acesso Rápido
+
+Use as credenciais abaixo após rodar o backend (ou cadastre via Postman):
+Email: admin@gestaoprojetos.com
+Senha: 123456
 
 ---
 
-🤝 Projeto desenvolvido para
-Projeto criado com foco em testes práticos, demonstração de portfólio ou oportunidades freelancer.
+📸 Prints do sistema
+
+![alt text](image-4.png)
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
 
 ---
 
