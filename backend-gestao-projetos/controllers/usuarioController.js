@@ -1,6 +1,7 @@
 const Usuario = require('../models/Usuario');
 const bcrypt = require('bcryptjs');
 
+// 🔍 Listar usuários (apenas admins)
 async function listar(req, res) {
   if (req.usuario.perfil !== 'admin') {
     return res.status(403).json({ erro: 'Acesso negado' });
@@ -16,6 +17,7 @@ async function listar(req, res) {
   }
 }
 
+// ➕ Criar novo usuário
 async function criar(req, res) {
   if (req.usuario.perfil !== 'admin') {
     return res.status(403).json({ erro: 'Acesso negado' });
@@ -34,7 +36,7 @@ async function criar(req, res) {
     const novo = await Usuario.create({
       nome,
       email,
-      senha: senhaHash,
+      senhaHash,
       perfil
     });
 
@@ -49,6 +51,7 @@ async function criar(req, res) {
   }
 }
 
+// ✏️ Atualizar usuário
 async function atualizar(req, res) {
   if (req.usuario.perfil !== 'admin') {
     return res.status(403).json({ erro: 'Acesso negado' });
@@ -64,13 +67,13 @@ async function atualizar(req, res) {
     }
 
     await usuario.update({ nome, email, perfil });
-
     res.json({ msg: 'Usuário atualizado com sucesso' });
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao atualizar usuário', detalhes: err.message });
   }
 }
 
+// ❌ Excluir usuário
 async function excluir(req, res) {
   if (req.usuario.perfil !== 'admin') {
     return res.status(403).json({ erro: 'Acesso negado' });
@@ -95,7 +98,7 @@ async function excluir(req, res) {
   }
 }
 
-// ⬇️ AQUI entra o bloco final
+// ✅ Exporta as funções corretamente
 module.exports = {
   listar,
   criar,

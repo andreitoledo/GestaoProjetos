@@ -11,13 +11,14 @@ const Usuario = sequelize.define('Usuario', {
     unique: true,
     allowNull: false
   },
-  senha: {
+  senhaHash: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    field: 'senhaHash' // 👈 necessário se o nome no banco é diferente da chave JS
   },
   perfil: {
     type: DataTypes.STRING,
-    defaultValue: 'cliente' // pode ser 'admin' ou 'cliente'
+    defaultValue: 'cliente'
   }
 }, {
   tableName: 'Usuarios',

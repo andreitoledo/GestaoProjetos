@@ -7,11 +7,11 @@ const gerarToken = (payload) =>
 
 module.exports = {
   async cadastrar(req, res) {
-    const { nome, email, senha, perfil } = req.body; // 👈 trocado de `role` para `perfil`
-    const senhaHash = await bcrypt.hash(senha, 10);
+    const { nome, email, senha, perfil } = req.body;
+    const senhaHash = await bcrypt.hash(senha, 10); // ✅ correto
 
     try {
-      const usuario = await Usuario.create({ nome, email, senha: senhaHash, perfil });
+      const usuario = await Usuario.create({ nome, email, senhaHash, perfil }); // ✅ correto
       return res.status(201).json({
         id: usuario.id,
         nome,
@@ -27,12 +27,12 @@ module.exports = {
     const { email, senha } = req.body;
     const usuario = await Usuario.findOne({ where: { email } });
 
-    if (!usuario || !await bcrypt.compare(senha, usuario.senha))
+    if (!usuario || !await bcrypt.compare(senha, usuario.senhaHash)) // ✅ correto
       return res.status(401).json({ erro: 'Credenciais inválidas' });
 
     const token = gerarToken({
       id: usuario.id,
-      perfil: usuario.perfil // 👈 isso que será acessado em req.usuario.perfil
+      perfil: usuario.perfil
     });
 
     return res.json({

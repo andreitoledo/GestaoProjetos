@@ -6,11 +6,34 @@ import ResumoDashboard from '../components/ResumoDashboard';
 import { useAuth } from '../context/AuthContext';
 
 
+
 export default function Dashboard() {
   const [projetos, setProjetos] = useState([]);
   const [loading, setLoading] = useState(true);
   const { usuario } = useAuth();
   const navigate = useNavigate();
+  const { setUsuario } = useAuth();
+  const trocarUsuario = (tipo) => {
+    const usuariosMock = {
+      admin: {
+        id: 1,
+        nome: 'Admin',
+        email: 'admin@gestaoprojetos.com',
+        perfil: 'admin'
+      },
+      cliente: {
+        id: 2,
+        nome: 'Gislene',
+        email: 'gi@teste.com',
+        perfil: 'cliente'
+      }
+    };
+
+    const novo = usuariosMock[tipo];
+    localStorage.setItem('usuario', JSON.stringify(novo));
+    setUsuario(novo);
+    window.location.reload();
+  };
 
   useEffect(() => {
     api.get('/projetos')
@@ -48,7 +71,16 @@ export default function Dashboard() {
               </button>
             )}
           </div>
-         
+
+        </div>
+        {/* Botões de troca rápida de usuário (somente para testes) */}
+        <div className="flex justify-end gap-2 text-sm mb-4">
+          <button onClick={() => trocarUsuario('admin')} className="bg-blue-600 text-white px-3 py-1 rounded">
+            🔄 Trocar para Admin
+          </button>
+          <button onClick={() => trocarUsuario('cliente')} className="bg-gray-600 text-white px-3 py-1 rounded">
+            🔄 Trocar para Cliente
+          </button>
         </div>
 
         {loading ? (
