@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
 import ResumoDashboard from '../components/ResumoDashboard';
+import { useAuth } from '../context/AuthContext';
+
 
 export default function Dashboard() {
   const [projetos, setProjetos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { usuario } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,12 +31,24 @@ export default function Dashboard() {
 
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Meus Projetos</h2>
-          <button
-            onClick={() => navigate('/novo-projeto')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-          >
-            + Novo Projeto
-          </button>
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => navigate('/novo-projeto')}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              + Novo Projeto
+            </button>
+
+            {usuario?.perfil === 'admin' && (
+              <button
+                onClick={() => navigate('/admin/usuarios')}
+                className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+              >
+                Administração
+              </button>
+            )}
+          </div>
+         
         </div>
 
         {loading ? (
