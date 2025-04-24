@@ -1,7 +1,6 @@
 const Tarefa = require('../models/Tarefa');
 const Projeto = require('../models/Projeto');
-const sequelize = require('../config/database'); // ✅ CORRETO!
-
+const sequelize = require('../config/database');
 
 module.exports = {
   async criar(req, res) {
@@ -47,14 +46,19 @@ module.exports = {
       const { titulo, descricao, status } = req.body;
 
       const tarefa = await Tarefa.findByPk(id);
-      if (!tarefa || tarefa.UsuarioId !== req.usuario.id) {
-        return res.status(403).json({ erro: 'Tarefa não encontrada ou sem permissão' });
+      if (!tarefa) {
+        return res.status(404).json({ erro: 'Tarefa não encontrada' });
+      }
+
+      // Permite apenas o dono ou admins
+      if (tarefa.UsuarioId !== req.usuario.id && req.usuario.perfil !== 'admin') {
+        return res.status(403).json({ erro: 'Sem permissão para atualizar esta tarefa' });
       }
 
       await tarefa.update({ titulo, descricao, status });
       res.json(tarefa);
     } catch (err) {
-      res.status(500).json({ erro: 'Erro ao atualizar tarefa' });
+      res.status(500).json({ erro: 'Erro ao atualizar tarefa', detalhes: err.message });
     }
   },
 
@@ -63,18 +67,22 @@ module.exports = {
       const { id } = req.params;
       const tarefa = await Tarefa.findByPk(id);
 
-      if (!tarefa || tarefa.UsuarioId !== req.usuario.id) {
-        return res.status(403).json({ erro: 'Tarefa não encontrada ou sem permissão' });
+      if (!tarefa) {
+        return res.status(404).json({ erro: 'Tarefa não encontrada' });
+      }
+
+      // Permite apenas o dono ou admins
+      if (tarefa.UsuarioId !== req.usuario.id && req.usuario.perfil !== 'admin') {
+        return res.status(403).json({ erro: 'Sem permissão para excluir esta tarefa' });
       }
 
       await tarefa.destroy();
       res.status(204).send();
     } catch (err) {
-      res.status(500).json({ erro: 'Erro ao deletar tarefa' });
+      res.status(500).json({ erro: 'Erro ao deletar tarefa', detalhes: err.message });
     }
   },
 
-  // 👇 Função para o gráfico do dashboard
   async resumo(req, res) {
     try {
       const [resultado] = await sequelize.query(`

@@ -9,5 +9,7 @@ router.post('/', projetoController.criar);
 router.get('/', projetoController.listar);
 router.put('/:id', projetoController.atualizar);
 router.delete('/:id', projetoController.deletar);
+router.get('/:id', projetoController.detalhar); // 👈 necessário para o TarefasProjeto
+
 
 module.exports = router;

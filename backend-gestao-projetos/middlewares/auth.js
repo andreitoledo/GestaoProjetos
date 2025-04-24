@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.usuario = decoded; // 👈 já vai conter `perfil` se o token foi gerado corretamente
+    req.usuario = decoded; // 👈 inclui id e perfil
     next();
   } catch (err) {
     return res.status(403).json({ erro: 'Token inválido' });

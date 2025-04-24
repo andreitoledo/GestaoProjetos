@@ -13,6 +13,7 @@ router.post('/', tarefaController.criar);
 router.get('/:projetoId', tarefaController.listarPorProjeto);
 router.put('/:id', tarefaController.atualizar);
 router.delete('/:id', tarefaController.deletar);
+router.get('/projeto/:projetoId', tarefaController.listarPorProjeto);
 
 // Upload de arquivo por tarefa
 router.post('/:id/upload', upload.single('arquivo'), async (req, res) => {
