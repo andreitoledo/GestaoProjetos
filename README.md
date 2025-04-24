@@ -1,37 +1,25 @@
-# 🧩 Sistema de Gestão de Projetos Freelance
+# 📋 Gestão de Projetos com React, Node.js e SQL Server
 
-Sistema completo de gestão de projetos e tarefas voltado para freelancers, pequenos times ou empresas que desejam acompanhar o andamento de seus projetos com organização e agilidade.
-
-> 💼 Desenvolvido com foco em portfólio para apresentação em plataformas de freelancer (99freelas, Workana, etc.).
+Sistema web completo para gestão de projetos, tarefas, comentários, uploads e usuários, com níveis de acesso por perfil (admin e cliente).
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-### Backend
-- Node.js + Express
-- Sequelize ORM (SQL Server)
-- JWT + Bcrypt para autenticação
-- Dotenv + CORS
-- Arquitetura MVC
-
-### Frontend
-- React.js
-- Axios + Context API (Auth)
-- React Router DOM
-- (Em progresso) TailwindCSS para layout responsivo
+Frontend: React.js, TailwindCSS
+Backend: Node.js + Express
+Banco de dados: SQL Server
+ORM: Sequelize
+Autenticação: JWT
+Upload de arquivos: multipart/form-data (com armazenamento local)
 
 ---
 
-## 🔐 Funcionalidades Principais
+## 🔐 Perfis de usuário
 
-- Login seguro com JWT
-- Proteção de rotas via middleware e context
-- CRUD de Projetos
-- CRUD de Tarefas
-- Relacionamento entre Usuário → Projeto → Tarefas
-- Listagem de tarefas por status
-- Controle de acesso por tipo de usuário (admin / cliente)
+Tipo	Permissões principais
+admin	Gerencia usuários e projetos
+cliente	Gerencia apenas seus próprios projetos e tarefas
 
 ---
 
@@ -39,63 +27,73 @@ Sistema completo de gestão de projetos e tarefas voltado para freelancers, pequ
 
 gestao-projetos/ ├── backend-gestao-projetos/ │ └── Node.js + Express + SQL Server ├── frontend-gestao-projetos/ │ └── React.js + Context API + Axios
 
-
 ---
 
-## 📷 Prints do Sistema (em breve)
+## 🧭 Funcionalidades
 
-- [ ] Tela de Login
-- [ ] Dashboard de Projetos
-- [ ] Visualização de Tarefas
-- [ ] Criação de Projeto
+Autenticação com JWT (login com token)
+Tela de login com retorno de token
+Cadastro e gerenciamento de projetos por usuário
+CRUD de tarefas por projeto
+Controle de status das tarefas (todo, em andamento, concluído)
+Comentários por tarefa
+Upload e visualização de arquivos anexados
+Tags associadas às tarefas
+Dashboard com resumo gráfico (tarefas por status)
+Painel administrativo para gerenciamento de usuários (apenas admin)
 
 ---
+## 🖥️ Como rodar o projeto localmente
 
-## 🗂 Roadmap por Sprints
+1. Clone este repositório
+git clone https://github.com/seu-usuario/gestao-projetos.git
+cd gestao-projetos
 
-Consulte o [project-roadmap.md](./project-roadmap.md) para acompanhar a evolução por sprint.
+2. Crie o banco de dados no SQL Server
+Crie um banco chamado GestaoProjetos
+Execute os scripts da pasta scripts/sql (se aplicável)
+Configure as variáveis no .env
 
----
-
-## 🛠️ Como Rodar o Projeto
-
-### Backend
-1. Acesse `/backend-gestao-projetos`
-2. Configure o `.env` com as informações do seu SQL Server
-3. Instale as dependências:
-```bash
+3. Configuração do backend
+cd backend-gestao-projetos
+cp .env.example .env
 npm install
+npx sequelize db:migrate   # se houver migrations
+npx sequelize db:seed:all   # se houver seeds
+npm run dev
 
-
-Inicie com:
-
-npx nodemon server.js
-
-
-Frontend
-Acesse /frontend-gestao-projetos
-
-Instale as dependências:
-
+4. Configuração do frontend
+cd ../frontend-gestao-projetos
 npm install
-
 npm start
 
-🌍 Deploy (em breve)
-Backend: Render
+🔑 Variáveis de ambiente (.env)
+# .env backend
+DB_HOST=localhost
+DB_PORT=1433
+DB_NAME=GestaoProjetos
+DB_USER=sa
+DB_PASS=suasenha
+JWT_SECRET=sua_chave_secreta
+---
 
-Frontend: Vercel
-
-📄 Licença
-Este projeto é de uso pessoal e pode ser adaptado livremente para fins de aprendizado, portfólio e demonstrações profissionais.
-
-🤝 Contato
-Desenvolvedor: Andrei
-📧 Email: andreiltoledo@hotmail.com
-🔗 Perfil 99freelas: andrei-toledo
-
+📸 Prints do sistema
+Inclua algumas imagens aqui (dashboard, tela de tarefas, administração de usuários...)
 
 ---
+
+🤝 Projeto desenvolvido para
+Projeto criado com foco em testes práticos, demonstração de portfólio ou oportunidades freelancer.
+
+---
+
+📬 Contato
+Desenvolvedor: Andrei Toledo
+📧 Email: andreiltoledo@hotmail.com
+LinkedIn: https://linkedin.com/in/andreilucianotoledo/
+
+---
+
 
 
 
