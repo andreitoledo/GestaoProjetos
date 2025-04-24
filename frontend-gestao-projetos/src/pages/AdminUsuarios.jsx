@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [novo, setNovo] = useState({ nome: '', email: '', senha: '', perfil: 'cliente' });
-  const [editando, setEditando] = useState(null); // objeto do usuário em edição
+  const [editando, setEditando] = useState(null);
+
+  //const usuarioLogado = JSON.parse(localStorage.getItem('usuario') || 'null');
+  const { usuario: usuarioLogado } = useAuth();
 
   useEffect(() => {
     carregarUsuarios();
@@ -40,6 +44,17 @@ export default function AdminUsuarios() {
     } catch (err) {
       console.error('Erro ao editar usuário:', err);
       alert('Erro ao salvar alterações');
+    }
+  };
+
+  const handleExcluirUsuario = async (id) => {
+    if (!window.confirm('Tem certeza que deseja excluir este usuário?')) return;
+    try {
+      await api.delete(`/admin/usuarios/${id}`);
+      carregarUsuarios();
+    } catch (err) {
+      console.error('Erro ao excluir:', err);
+      alert('Erro ao excluir usuário');
     }
   };
 
@@ -88,13 +103,23 @@ export default function AdminUsuarios() {
                 <td className="p-2">{u.nome}</td>
                 <td className="p-2">{u.email}</td>
                 <td className="p-2">{u.perfil}</td>
-                <td className="p-2">
-                  <button
-                    onClick={() => setEditando(u)}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    ✏️ Editar
-                  </button>
+                <td className="p-2 flex gap-2">
+                  {u.id !== usuarioLogado.id && (
+                    <>
+                      <button
+                        onClick={() => setEditando(u)}
+                        className="text-blue-600 hover:underline text-sm"
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        onClick={() => handleExcluirUsuario(u.id)}
+                        className="text-red-600 hover:underline text-sm"
+                      >
+                        🗑️ Excluir
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}
@@ -104,7 +129,7 @@ export default function AdminUsuarios() {
 
       {/* Modal de edição */}
       {editando && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4">Editar Usuário</h2>
 
