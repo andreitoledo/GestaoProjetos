@@ -68,7 +68,7 @@ npm install
 npm start
 
 🔑 Variáveis de ambiente (.env)
-# .env backend
+ .env backend
 DB_HOST=localhost
 DB_PORT=1433
 DB_NAME=GestaoProjetos
