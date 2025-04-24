@@ -2,7 +2,7 @@
 
 Sistema completo de gestão de projetos desenvolvido com **React**, **Node.js** e **Sequelize + SQL Server**. Permite o controle de tarefas, comentários, arquivos, tags, usuários e permissões — com autenticação via JWT.
 
-![Dashboard do Sistema](./banner-dashboard.png)
+![Dashboard do Sistema](./dashboard.png)
 
 ---
 
