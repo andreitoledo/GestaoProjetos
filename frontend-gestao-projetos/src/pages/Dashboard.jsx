@@ -72,17 +72,8 @@ export default function Dashboard() {
             )}
           </div>
 
-        </div>
-        {/* Botões de troca rápida de usuário (somente para testes) */}
-        <div className="flex justify-end gap-2 text-sm mb-4">
-          <button onClick={() => trocarUsuario('admin')} className="bg-blue-600 text-white px-3 py-1 rounded">
-            🔄 Trocar para Admin
-          </button>
-          <button onClick={() => trocarUsuario('cliente')} className="bg-gray-600 text-white px-3 py-1 rounded">
-            🔄 Trocar para Cliente
-          </button>
-        </div>
-
+        </div>      
+      
         {loading ? (
           <p className="text-gray-500">Carregando...</p>
         ) : (
